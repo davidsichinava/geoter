@@ -1,7 +1,7 @@
 
 ##### Make a function for multi-faceted maps with shared legend.
 ##### Originally the function was written by Shaun Jackman: http://rpubs.com/sjackman/grid_arrange_shared_legend
-##### Later it was re-writtend and enhanced by Baptiste Auguié: https://github.com/tidyverse/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+##### Later Baptiste Auguié rewrote and enhanced it: https://github.com/tidyverse/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
 
 grid_arrange_shared_legend <- function(...) {
   plots <- list(...)
@@ -25,7 +25,7 @@ etable<-as.data.frame(setNames(replicate(3,numeric(0), simplify = F), letters[1:
 
 ###### Step 2: Do calculations for each election year
 
-### 2016 Parpliamentary elections
+### 2016 Parliamentary elections
 IDs<-row.names(m2016)
 coords<-coordinates(m2016)
 m8w <- poly2nb(m2016)
@@ -407,10 +407,10 @@ m1 <- ggplot()+
 		labs(title = "2008 Presidential Elections")+
 		theme_void()+
 		theme(
-				plot.title = element_text(colour = "Black", size=20, family = "Times New Roman"),
+				plot.title = element_text(colour = "Black", size=24, family = "Times New Roman"),
 				legend.position = "bottom",
-				legend.title=element_text(family="Times New Roman", face="bold", size=14),
-				legend.text=element_text(family="Times New Roman", face="bold", size=14)
+				legend.title=element_text(family="Times New Roman", face="bold", size=18),
+				legend.text=element_text(family="Times New Roman", face="bold", size=18)
 		  )
 print(m1)
 
@@ -420,46 +420,57 @@ print(m1)
 lags <- rbind(lags08p, lags08, lags12, lags13, lags16)
 
 corlg <- ggplot(lags, aes(x=lag, y=V1, group=dataset))+
+  geom_point(aes(colour=dataset, shape=dataset), size=4)+
+  geom_path(aes(colour=dataset), size=1)+
   scale_color_manual(name="Elections",
-                     values=c("#377eb8", "#e41a1c", "#4daf4a", "#984ea3", "#ff7f00"),
-                     guide = FALSE)+
-  geom_point(aes(colour=dataset, shape=dataset), size=3)+
-  geom_path(aes(colour=dataset))+
-  guides(shape=guide_legend(title="Elections"))+
+					labels = c("Parliamentary 2008", "Parliamentary 2012", "Parliamentary 2016", 
+						"Presidential 2008", "Presidential 2013"),
+                     values=c("#377eb8", "#e41a1c", "#4daf4a", "#984ea3", "#ff7f00"))+
+  scale_shape_manual(name="Elections",
+					labels = c("Parliamentary 2008", "Parliamentary 2012", "Parliamentary 2016", 
+						"Presidential 2008", "Presidential 2013"),
+					values = c(15, 16, 17, 18, 8))+
+  # guides(shape=guide_legend(title="Elections"))+
   geom_errorbar(aes(ymin=V1-2*sqrt(V3), ymax=V1+2*sqrt(V3),
                     colour=dataset),
-                width = 0.1)+
-  labs(title="Spatial Correlogram of UNM and Its Presidential Candidate Votes, 2008-2016",
+                width = 0.15, size=1)+
+  labs(
+		# title="Spatial Correlogram of UNM and Its Presidential Candidate Votes, 2008-2016",
        x="Spatial Lag",
        y="Moran's I")+
-  ylim(0, 1)+
-  scale_x_continuous(limits = c(1, 10),
+  scale_y_continuous(expand = c(0, 0), limits=c(0, 0.8))+
+  scale_x_continuous(
+                    #limits = c(1, 10),
                      breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))+
   theme_mplot+
   theme(
-	legend.text=element_text(size=16, family = "Times New Roman"),
-	legend.title=element_text(size=18, family = "Times New Roman")
+	legend.text=element_text(size=20, family = "Times New Roman"),
+	legend.title=element_text(size=22, family = "Times New Roman"),
+	legend.position = c(0.85, 0.5),
+	legend.background = element_rect(fill = "white", size = 1, linetype = "solid")
+
   )
 
 print(corlg)
 
-ggsave("print/corlg.png", corlg, width = 13, height = 10, dpi=300)
+ggsave("print/figure1.tiff", corlg, width = 13, height = 10, dpi=300, compression = "lzw")
+
+###### Refer to the qgis_map folder for figure2
 
 
-###### Step 5: Combine LISA maps for each elections and save it in graphic format
+###### Step 5: Combine LISA maps for each elections and save it in graphic format as figure3
 
 combi<-grid_arrange_shared_legend(m1, m2, m3, m4, m5,  ncol=2, nrow=3)
 
 print(combi)
 
-ggsave("print/combi.png", combi, width = 13, height = 10, dpi=300)
-
+ggsave("print/figure3.tiff", combi, width = 13, height = 10, dpi=300, compression = "lzw")
 
 ###### Make a table for global Moran's I coefficients
 
 stargazer(etable, summary = FALSE, rownames = FALSE,
           type="html", digits = 1,
           digits.extra = 1,
-          out="print/moran.htm")
+          out="print/table2.htm")
 
 .

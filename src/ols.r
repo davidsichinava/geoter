@@ -26,9 +26,9 @@ fmodel6 <- plm(UNMProp~TurnoutProp,
 
 			   
 
-#### Save regression tables
+#### Save regression table
 			   
 stargazer(fmodel1, fmodel2, fmodel3, fmodel4, fmodel5, fmodel6, type="text",  
           dep.var.labels=c("Vote share for the United National Movement or its candidate"),
           covariate.labels=c("Total turnout", "Proportion of orthodox population", "Proportion of native Georgian speakers", "Proportion of population with higher education", "Proportion of urban population","Inverse of the district size"),
-          out="print/models.htm")
+          out="print/table3.htm")
